@@ -1,0 +1,26 @@
+# Python virtual environments (local and platform-specific)
+/.venv/
+/venv/
+/env/
+/ENV/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+/.pytest_cache/
+
+# Local datasets and experiment outputs
+/datasets/
+/experiment_runs/
+/old_runs/
+/runs/
+
+# Generated numerical arrays and model checkpoints
+*.npy
+*.npz
+*.pkl
+*.pickle
+*.joblib
+*.pt
+*.pth
+*.ckpt

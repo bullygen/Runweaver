@@ -1,0 +1,28 @@
+{
+  "version": "article-quality-v1.0-predeclared",
+  "minimum_sample_sizes": {
+    "test": 500,
+    "test_null": 100,
+    "verification": 500,
+    "verification_null": 100
+  },
+  "strong": {
+    "test_precision_ci95_low": 0.90,
+    "test_recall_ci95_low": 0.82,
+    "test_f1_ci95_low": 0.85,
+    "test_null_fppi_ci95_high": 0.10,
+    "test_worst_factor_f1_ci95_low": 0.70,
+    "verification_precision_ci95_low": 0.75,
+    "verification_recall_ci95_low": 0.65,
+    "verification_f1_ci95_low": 0.70,
+    "verification_null_fppi_ci95_high": 0.25
+  },
+  "promising_limited": {
+    "test_precision": 0.85,
+    "test_recall": 0.75,
+    "test_f1": 0.80,
+    "test_null_fppi": 0.25,
+    "verification_f1": 0.60,
+    "verification_null_fppi": 0.50
+  }
+}

@@ -1,0 +1,12 @@
+[project]
+name = "smbh-cv-pipeline"
+version = "0.3.0"
+description = "Modular D1-D6 pipeline for synthetic SMBH ring morphology experiments"
+requires-python = ">=3.10"
+dependencies = ["numpy", "scipy", "scikit-image", "psutil"]
+
+[project.scripts]
+smbh-cv-run = "smbh_cv_pipeline.cli:main"
+smbh-cv-dataset = "smbh_cv_pipeline.dataset_cli:main"
+smbh-cv-experiments = "smbh_cv_pipeline.experiment_runner:main"
+smbh-cv-quality = "smbh_cv_pipeline.quality_gate:main"
