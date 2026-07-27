@@ -5,8 +5,8 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import logging
 import math
-import os
 import shutil
 from dataclasses import fields
 from pathlib import Path
@@ -14,7 +14,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Sequence
 
 import numpy as np
 
-from .cli import STAGE_FUNCS, _pool_map
+from .cli import STAGE_FUNCS, _pool_map, setup_logging
 from .config import PipelineConfig
 from .io_utils import dump_json, read_json, run_paths
 from .statistics import run_statistics
@@ -135,10 +135,14 @@ _STAGE_OUTPUT = {
 }
 
 
-def _stage_complete(cfg: PipelineConfig, stage: str, image_ids: Sequence[str]) -> bool:
+def _missing_stage_image_ids(cfg: PipelineConfig, stage: str, image_ids: Sequence[str]) -> List[str]:
     paths = run_paths(cfg.out)
     key, filename = _STAGE_OUTPUT[stage]
-    return all((paths[key] / image_id / filename).exists() for image_id in image_ids)
+    return [
+        image_id
+        for image_id in image_ids
+        if not (paths[key] / image_id / filename).is_file()
+    ]
 
 
 def _run_one(
@@ -180,8 +184,21 @@ def _run_one(
     image_ids = [str(item["image_id"]) for item in items]
     workers = spec.get("workers", {})
     for stage in ("d1", "d2", "d3", "d4", "d5", "d6"):
-        if not _stage_complete(cfg, stage, image_ids):
-            _pool_map(stage, STAGE_FUNCS[stage], cfg, image_ids, int(workers.get(stage, 1)))
+        missing_image_ids = _missing_stage_image_ids(cfg, stage, image_ids)
+        if not missing_image_ids:
+            continue
+        logging.info(
+            "Resuming %s candidate=%s seed=%d: %d/%d images pending",
+            stage.upper(), candidate_id, algorithm_seed, len(missing_image_ids), len(image_ids),
+        )
+        _pool_map(
+            stage,
+            STAGE_FUNCS[stage],
+            cfg,
+            missing_image_ids,
+            int(workers.get(stage, 1)),
+            total_items=len(image_ids),
+        )
     summary_path = run_dir / "statistics" / "summary.json"
     if not summary_path.exists():
         run_statistics(cfg)
@@ -317,6 +334,7 @@ def load_spec(path: str | Path) -> Dict[str, Any]:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Plan and execute resumable multi-start D1-D6 hyperparameter experiments.")
     parser.add_argument("--spec", default="experiments/article_v1/search_plan.json")
+    parser.add_argument("--log-level", default="INFO")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("plan")
     run = sub.add_parser("run")
@@ -334,6 +352,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    setup_logging(args.log_level)
     spec = load_spec(args.spec)
     candidates = create_candidates(spec)
     plan_path = Path(spec["output_root"]) / "candidate_plan.json"
@@ -354,8 +373,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.max_candidates is not None:
         selected = selected[: args.max_candidates]
     seeds = [int(x) for x in spec["phases"][args.phase]["algorithm_seeds"]]
-    for candidate in selected:
+    for candidate_index, candidate in enumerate(selected, 1):
         for seed in seeds:
+            logging.info(
+                "Running candidate %d/%d id=%s seed=%d",
+                candidate_index, len(selected), candidate["candidate_id"], seed,
+            )
             _run_one(spec, args.phase, candidate, seed, restart=args.restart)
     result = summarize_phase(spec, args.phase, selected)
     print(json.dumps({"phase": args.phase, "completed_candidates": len(result["ranking"])}, ensure_ascii=False))

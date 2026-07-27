@@ -10,7 +10,7 @@ import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Sequence
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Sequence
 
 import psutil
 
@@ -68,12 +68,37 @@ def _update_cfg(cfg: PipelineConfig, args: argparse.Namespace) -> PipelineConfig
     return cfg
 
 
-def _pool_map(stage: str, func: Callable[[Dict[str, Any], str], Dict[str, Any]], cfg: PipelineConfig, image_ids: Sequence[str], workers: int) -> List[Dict[str, Any]]:
+def _pool_map(
+    stage: str,
+    func: Callable[[Dict[str, Any], str], Dict[str, Any]],
+    cfg: PipelineConfig,
+    image_ids: Sequence[str],
+    workers: int,
+    total_items: int | None = None,
+) -> List[Dict[str, Any]]:
     workers = max(1, int(workers))
-    logging.info("Starting %s with workers=%d for %d images", stage.upper(), workers, len(image_ids))
+    requested_items = len(image_ids)
+    total_items = requested_items if total_items is None else int(total_items)
+    preexisting_items = max(0, total_items - requested_items)
+    logging.info(
+        "Starting %s with workers=%d for %d pending images (%d/%d already complete)",
+        stage.upper(), workers, requested_items, preexisting_items, total_items,
+    )
     t0 = time.perf_counter()
+    progress_step = max(1, requested_items // 20)
+
+    def record_progress(done: int, result: Mapping[str, Any]) -> None:
+        if done == 1 or done == requested_items or done % progress_step == 0:
+            logging.info(
+                "%s progress %d/%d pending images; latest=%s",
+                stage.upper(), done, requested_items, result.get("image_id", "unknown"),
+            )
+
     if workers == 1:
-        results = [func(cfg.to_dict(), image_id) for image_id in image_ids]
+        results = []
+        for image_id in image_ids:
+            results.append(func(cfg.to_dict(), image_id))
+            record_progress(len(results), results[-1])
     else:
         ctx = mp.get_context("spawn")
         results = []
@@ -81,8 +106,18 @@ def _pool_map(stage: str, func: Callable[[Dict[str, Any], str], Dict[str, Any]],
             futs = [ex.submit(func, cfg.to_dict(), image_id) for image_id in image_ids]
             for fut in as_completed(futs):
                 results.append(fut.result())
+                record_progress(len(results), results[-1])
     elapsed = time.perf_counter() - t0
-    dump_json(Path(cfg.out) / "runtime" / f"{stage}_stage_summary.json", {"stage": stage, "workers": workers, "n_items": len(image_ids), "wall_time_s": elapsed, "results": results})
+    dump_json(Path(cfg.out) / "runtime" / f"{stage}_stage_summary.json", {
+        "stage": stage,
+        "workers": workers,
+        "n_items": requested_items,
+        "n_items_total": total_items,
+        "n_items_preexisting": preexisting_items,
+        "wall_time_s": elapsed,
+        "wall_time_scope": "current_invocation",
+        "results": results,
+    })
     logging.info("Finished %s in %.3fs", stage.upper(), elapsed)
     return results
 

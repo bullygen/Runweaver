@@ -5,13 +5,21 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 
 from smbh_cv_pipeline.article_data import build_design, generate_split, load_plan, validate_dataset
+from smbh_cv_pipeline.cli import _pool_map
 from smbh_cv_pipeline.config import PipelineConfig
-from smbh_cv_pipeline.experiment_runner import create_candidates, load_spec
-from smbh_cv_pipeline.io_utils import dump_json
+from smbh_cv_pipeline.experiment_runner import (
+    _STAGE_OUTPUT,
+    _missing_stage_image_ids,
+    _run_one,
+    create_candidates,
+    load_spec,
+)
+from smbh_cv_pipeline.io_utils import dump_json, run_paths
 from smbh_cv_pipeline.quality_gate import evaluate_quality
 from smbh_cv_pipeline.statistics import _candidate_stage_recall, _match_article
 
@@ -61,6 +69,106 @@ class SearchTests(unittest.TestCase):
             self.assertFalse(locked.intersection(candidate["params"]))
             if "d6_merge_center_px" in candidate["params"]:
                 self.assertEqual(candidate["params"]["d6_merge_center_px"], candidate["params"]["d6_merge_radius_px"])
+
+    def test_missing_stage_images_are_detected_for_d1_through_d6(self) -> None:
+        image_ids = ["image_000000", "image_000001", "image_000002"]
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = PipelineConfig(out=tmp)
+            paths = run_paths(tmp)
+            for stage, (path_key, filename) in _STAGE_OUTPUT.items():
+                for image_id in (image_ids[0], image_ids[2]):
+                    output = paths[path_key] / image_id / filename
+                    output.parent.mkdir(parents=True, exist_ok=True)
+                    output.write_bytes(b"complete")
+                with self.subTest(stage=stage):
+                    self.assertEqual(_missing_stage_image_ids(cfg, stage, image_ids), [image_ids[1]])
+
+    def test_run_resumes_each_partial_stage_with_only_missing_images(self) -> None:
+        image_ids = ["image_000000", "image_000001", "image_000002"]
+        stages = list(_STAGE_OUTPUT)
+        for interrupted_index, interrupted_stage in enumerate(stages):
+            with self.subTest(stage=interrupted_stage), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                dataset_split = root / "dataset" / "development"
+                dataset_items = []
+                for image_id in image_ids:
+                    image_dir = dataset_split / "images" / image_id
+                    image_dir.mkdir(parents=True, exist_ok=True)
+                    dataset_items.append({"image_id": image_id, "image_sha256": image_id})
+                dump_json(dataset_split / "manifest.json", {"plan_hash": "test-plan", "items": dataset_items})
+
+                base_config = root / "base_config.json"
+                dump_json(base_config, PipelineConfig().to_dict())
+                output_root = root / "runs"
+                run_dir = output_root / "screening" / "candidate" / "algorithm_seed_239"
+                paths = run_paths(run_dir)
+
+                for completed_stage in stages[:interrupted_index]:
+                    path_key, filename = _STAGE_OUTPUT[completed_stage]
+                    for image_id in image_ids:
+                        output = paths[path_key] / image_id / filename
+                        output.parent.mkdir(parents=True, exist_ok=True)
+                        output.write_bytes(b"complete")
+
+                path_key, filename = _STAGE_OUTPUT[interrupted_stage]
+                for image_id in (image_ids[0], image_ids[2]):
+                    output = paths[path_key] / image_id / filename
+                    output.parent.mkdir(parents=True, exist_ok=True)
+                    output.write_bytes(b"complete")
+
+                calls = []
+
+                def fake_pool(stage, func, cfg, pending_ids, workers, total_items=None):
+                    pending_ids = list(pending_ids)
+                    calls.append((stage, pending_ids, total_items))
+                    output_key, output_filename = _STAGE_OUTPUT[stage]
+                    stage_paths = run_paths(cfg.out)
+                    for image_id in pending_ids:
+                        output = stage_paths[output_key] / image_id / output_filename
+                        output.parent.mkdir(parents=True, exist_ok=True)
+                        output.write_bytes(b"complete")
+                    return [{"image_id": image_id, "status": "ok"} for image_id in pending_ids]
+
+                def fake_statistics(cfg):
+                    summary = {"article_f1": 0.0}
+                    dump_json(Path(cfg.out) / "statistics" / "summary.json", summary)
+                    return summary
+
+                spec = {
+                    "dataset_root": str(root / "dataset"),
+                    "base_config": str(base_config),
+                    "output_root": str(output_root),
+                    "workers": {stage: 1 for stage in stages},
+                    "phases": {"screening": {"split": "development", "algorithm_seeds": [239]}},
+                }
+                candidate = {"candidate_id": "candidate", "params": {}}
+
+                with (
+                    patch("smbh_cv_pipeline.experiment_runner._prepare_run"),
+                    patch("smbh_cv_pipeline.experiment_runner._pool_map", side_effect=fake_pool),
+                    patch("smbh_cv_pipeline.experiment_runner.run_statistics", side_effect=fake_statistics),
+                ):
+                    _run_one(spec, "screening", candidate, 239)
+
+                expected = [
+                    (stage, [image_ids[1]] if index == interrupted_index else image_ids, len(image_ids))
+                    for index, stage in enumerate(stages[interrupted_index:], interrupted_index)
+                ]
+                self.assertEqual(calls, expected)
+
+    def test_resumed_stage_summary_separates_pending_and_preexisting_images(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = PipelineConfig(out=tmp)
+
+            def process_one(cfg_dict, image_id):
+                return {"image_id": image_id, "status": "ok"}
+
+            _pool_map("d5", process_one, cfg, ["image_000002"], workers=1, total_items=3)
+            summary = json.loads((Path(tmp) / "runtime" / "d5_stage_summary.json").read_text())
+            self.assertEqual(summary["n_items"], 1)
+            self.assertEqual(summary["n_items_total"], 3)
+            self.assertEqual(summary["n_items_preexisting"], 2)
+            self.assertEqual(summary["wall_time_scope"], "current_invocation")
 
 
 class MetricTests(unittest.TestCase):

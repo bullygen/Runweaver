@@ -74,10 +74,12 @@ MPLCONFIGDIR=/tmp/smbh-mpl \
   run --phase smoke --max-candidates 1
 ```
 
-Повторная команда продолжает готовые runs по stage outputs. `run_signature.json`
-фиксирует dataset hashes, image IDs, phase, seed и полный config; runner откажется
-смешивать старые stage artifacts с изменённым планом. `--restart` удаляет только
-выбранный run и запускает его заново; использовать этот флаг следует осознанно.
+Повторная команда пропускает полностью готовые стадии D1--D6, на первой
+незавершённой стадии запускает только изображения без соответствующего stage
+output и затем так же проверяет следующие стадии. `run_signature.json` фиксирует
+dataset hashes, image IDs, phase, seed и полный config; runner откажется смешивать
+старые stage artifacts с изменённым планом. `--restart` удаляет только выбранный
+run и запускает его заново; использовать этот флаг следует осознанно.
 
 ### 2. Promotion
 
