@@ -4,6 +4,7 @@
 
 The reproducible anti-overfitting workflow is documented in:
 
+- `ARTICLE_EXPERIMENT_COMMANDS.md` -- copy-paste commands for every execution case;
 - `ARTICLE_EXPERIMENT_PROTOCOL.md` -- entry point and execution order;
 - `EXPERIMENT_AUDIT_2026_07_21.md` -- PDF/Excel/code audit;
 - `DATASET_ARTICLE_V1.md` -- generated split composition and factor definitions;
