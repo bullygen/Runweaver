@@ -9,4 +9,5 @@ dependencies = ["numpy", "scipy", "scikit-image", "psutil"]
 smbh-cv-run = "smbh_cv_pipeline.cli:main"
 smbh-cv-dataset = "smbh_cv_pipeline.dataset_cli:main"
 smbh-cv-experiments = "smbh_cv_pipeline.experiment_runner:main"
+smbh-cv-experiments-v2 = "smbh_cv_pipeline.experiment_v2:main"
 smbh-cv-quality = "smbh_cv_pipeline.quality_gate:main"

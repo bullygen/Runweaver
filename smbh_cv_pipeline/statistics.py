@@ -645,7 +645,25 @@ def run_statistics(cfg: PipelineConfig) -> Dict[str, Any]:
     _write_csv(paths["stats"] / "parameter_errors_long.csv", param_rows)
     _write_csv(paths["stats"] / "parameter_metrics.csv", param_metrics)
     _write_csv(paths["stats"] / "factor_metrics.csv", factor_slices)
-    plots = make_aggregate_plots(paths["stats"], per_image, matches_rows, param_rows, residual_chunks, summary, dpi=cfg.viz_dpi)
+    plots = (
+        make_aggregate_plots(
+            paths["stats"],
+            per_image,
+            matches_rows,
+            param_rows,
+            residual_chunks,
+            summary,
+            dpi=cfg.viz_dpi,
+        )
+        if cfg.make_plots
+        else []
+    )
+    if not cfg.make_plots:
+        dump_json(paths["stats"] / "plot_manifest.json", {
+            "plot_count": 0,
+            "plots": [],
+            "disabled_by_config": True,
+        })
     summary["aggregate_plot_count"] = len(plots)
     dump_json(paths["stats"] / "summary.json", summary)
     return summary

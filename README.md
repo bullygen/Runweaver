@@ -91,7 +91,7 @@ workers_generate, workers_d1, workers_d2, workers_d3,
 workers_d4, workers_d5, workers_d6, workers_viz
 ```
 
-Обычный запуск по умолчанию использует один процесс. Текущий план `article_v1` задаёт для D1–D6 соответственно \(8,8,8,8,6,8\) процессов. Для тяжёлого плотного варианта D3 код оценивает требуемую память и ограничивает число процессов. При нескольких процессах один дочерний процесс выполняет одно изображение, что ограничивает накопление памяти во внешних численных библиотеках.
+Обычный запуск по умолчанию использует один процесс. Текущие планы `article_v1` и `article_v2` задают для D1–D6 соответственно \(8,8,8,8,12,8\) процессов. Для тяжёлого плотного варианта D3 код оценивает требуемую память и ограничивает число процессов. При нескольких процессах один дочерний процесс выполняет одно изображение, что ограничивает накопление памяти во внешних численных библиотеках.
 
 ### Продолжение после остановки
 
@@ -529,13 +529,10 @@ F_{1,verification}\ge0.60,\quad
 
 | Файл | Содержание |
 |---|---|
-| [`docs/README.md`](docs/README.md) | краткий обзор запуска, каталогов результатов и графиков |
-| [`docs/ARTICLE_EXPERIMENT_COMMANDS.md`](docs/ARTICLE_EXPERIMENT_COMMANDS.md) | готовые команды генерации, продолжения, фиксации параметров и итоговой оценки |
-| [`docs/ARTICLE_EXPERIMENT_PROTOCOL.md`](docs/ARTICLE_EXPERIMENT_PROTOCOL.md) | порядок полного исследования и границы допустимых выводов |
-| [`docs/EXPERIMENT_AUDIT_2026_07_21.md`](docs/EXPERIMENT_AUDIT_2026_07_21.md) | разбор прежних опытов, систематических смещений и ограничений старых оценок |
+| [`docs/ARTICLE_V1_EXPERIMENT_COMMANDS.md`](docs/ARTICLE_V1_EXPERIMENT_COMMANDS.md) | команды воспроизведения исходного плана article_v1 |
+| [`docs/ARTICLE_V1_EXPERIMENT_PROTOCOL.md`](docs/ARTICLE_V1_EXPERIMENT_PROTOCOL.md) | устройство, ограничения и порядок этапов article_v1 |
+| [`docs/ARTICLE_V2_EXPERIMENT_COMMANDS.md`](docs/ARTICLE_V2_EXPERIMENT_COMMANDS.md) | поэтапный поиск D1–D3, D4–D5 и D6 в article_v2 |
 | [`docs/DATASET_ARTICLE_V1.md`](docs/DATASET_ARTICLE_V1.md) | состав 1900 изображений, факторы, области параметров и проверка целостности |
 | [`docs/HYPERPARAMETER_SEARCH.md`](docs/HYPERPARAMETER_SEARCH.md) | числовой поиск, переход между этапами и продолжение расчёта |
 | [`docs/QUALITY_DECISION_DRAFT.md`](docs/QUALITY_DECISION_DRAFT.md) | формальные пороги решения о годности |
 | [`docs/D1_D6_METHOD_VARIANTS.md`](docs/D1_D6_METHOD_VARIANTS.md) | все варианты D1–D6 и полный перечень аргументов |
-| [`docs/README_viz.md`](docs/README_viz.md) | раннее краткое описание графического вывода |
-| [`docs/further_accuracy_plan_after_doe.md`](docs/further_accuracy_plan_after_doe.md) | исторический план опытов D6 и дальнейшего повышения точности |
