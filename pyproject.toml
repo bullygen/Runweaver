@@ -1,13 +1,140 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "smbh-cv-pipeline"
-version = "0.3.0"
-description = "Modular D1-D6 pipeline for synthetic SMBH ring morphology experiments"
-requires-python = ">=3.10"
-dependencies = ["numpy", "scipy", "scikit-image", "psutil"]
+name = "runweaver"
+version = "0.1.0"
+description = "Typed durable pipelines and iterative computational experiments over mature ML backends."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Runweaver contributors"}]
+keywords = ["pipelines", "experiments", "mlops", "reproducibility", "hpo"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+  "pydantic>=2.8,<3",
+  "pydantic-settings>=2.4,<3",
+  "SQLAlchemy>=2.0,<3",
+  "alembic>=1.13,<2",
+  "fsspec>=2024.6",
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "prefect>=3.0,<4",
+  "typer>=0.12,<1",
+]
+
+[project.optional-dependencies]
+pytorch = ["torch>=2.3", "torchmetrics>=1.4"]
+optuna = ["optuna>=4.0,<5"]
+ray = ["ray>=2.35", "prefect-ray>=0.4"]
+mlflow = ["mlflow>=2.15"]
+s3 = ["s3fs>=2024.6"]
+docs = [
+  "mkdocs>=1.6",
+  "mkdocs-material>=9.5",
+  "mkdocstrings[python]>=0.26",
+  "griffe>=1.0",
+  "jupyter>=1.0",
+  "jupytext>=1.16",
+  "mkdocs-jupyter>=0.25",
+]
+dev = [
+  "pytest>=8.2",
+  "pytest-cov>=5",
+  "pytest-xdist>=3.6",
+  "hypothesis>=6.110",
+  "mypy>=1.11",
+  "ruff>=0.6",
+  "pre-commit>=3.8",
+  "build>=1.2",
+  "twine>=5.1",
+  "nox>=2024.4",
+  "pip-audit>=2.7",
+]
 
 [project.scripts]
-smbh-cv-run = "smbh_cv_pipeline.cli:main"
-smbh-cv-dataset = "smbh_cv_pipeline.dataset_cli:main"
-smbh-cv-experiments = "smbh_cv_pipeline.experiment_runner:main"
-smbh-cv-experiments-v2 = "smbh_cv_pipeline.experiment_v2:main"
-smbh-cv-quality = "smbh_cv_pipeline.quality_gate:main"
+runweaver = "runweaver.cli.app:app"
+
+[project.entry-points."runweaver.blocks"]
+constant = "runweaver.builtins:constant_factory"
+scale = "runweaver.builtins:scale_factory"
+mean = "runweaver.builtins:mean_factory"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["runweaver*"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-config --strict-markers"
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+markers = [
+  "optional: requires an optional integration dependency",
+  "slow: deliberately longer end-to-end scenario",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["runweaver"]
+omit = [
+  "*/runweaver/__main__.py",
+  "*/runweaver/cli/*",
+  "*/runweaver/integrations/*",
+  "*/runweaver/persistence/migrations/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["*.ipynb"]
+src = ["src", "tests", "tutorials"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tutorials/*.py" = ["T201"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = [
+  "src/runweaver/domain",
+  "src/runweaver/contracts",
+  "src/runweaver/pipeline",
+  "src/runweaver/planning",
+  "src/runweaver/refinement",
+]
+mypy_path = "src"
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = [
+  "fsspec.*",
+  "mlflow.*",
+  "optuna.*",
+  "prefect.*",
+  "prefect_ray.*",
+  "ray.*",
+  "scipy.*",
+  "torch.*",
+  "torchmetrics.*",
+]
+ignore_missing_imports = true

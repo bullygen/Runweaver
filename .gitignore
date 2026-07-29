@@ -8,12 +8,24 @@
 __pycache__/
 *.py[cod]
 /.pytest_cache/
+/.mypy_cache/
+/.ruff_cache/
+/.hypothesis/
+/.coverage
+/htmlcov/
+/.ipynb_checkpoints/
 
 # Local datasets and experiment outputs
 /datasets/
 /experiment_runs/
 /old_runs/
 /runs/
+/.runweaver/
+/site/
+/dist/
+/build/
+/*.egg-info/
+/src/*.egg-info/
 
 # Generated numerical arrays and model checkpoints
 *.npy

@@ -1,0 +1,61 @@
+site_name: Runweaver
+site_description: Typed durable computational pipelines and iterative experiments
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - content.code.copy
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+  - mkdocs-jupyter:
+      execute: false
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+nav:
+  - Overview: index.md
+  - Installation: installation.md
+  - Quickstart: quickstart.md
+  - Core concepts: core-concepts.md
+  - Authoring blocks: authoring-blocks.md
+  - Data and model contracts: data-contracts.md
+  - Pipeline construction: pipelines.md
+  - Execution backends: execution.md
+  - Persistence, caching and resume: persistence-resume.md
+  - Experiment planning: planning.md
+  - Metrics, selection and refinement: metrics-selection.md
+  - PyTorch: pytorch.md
+  - Tracking and observability: tracking.md
+  - Configuration: configuration.md
+  - CLI: cli.md
+  - Plugins: plugins.md
+  - Migration: migration.md
+  - Performance: performance.md
+  - Reproducibility: reproducibility.md
+  - Errors and security: errors-security.md
+  - API: api.md
+  - Tutorials: tutorials.md
+  - FAQ: faq.md
+  - Contributing: contributing.md
+  - Architecture:
+      - Overview: architecture/index.md
+      - Decisions:
+          - Domain and Prefect: architecture/decisions/0001-domain-independent-prefect.md
+          - Ray optional: architecture/decisions/0002-ray-optional.md
+          - Domain store: architecture/decisions/0003-domain-state-store.md
+          - Content-addressed artifacts: architecture/decisions/0004-content-addressed-artifacts.md
+          - Explicit I/O: architecture/decisions/0005-explicit-pydantic-io.md
+          - PyTorch extra: architecture/decisions/0006-core-without-pytorch.md
+          - Policy separation: architecture/decisions/0007-separate-planning-decision-refinement.md
+          - Versioned JSON: architecture/decisions/0008-versioned-json-config.md
+          - No pickle: architecture/decisions/0009-no-pickle-default.md
+          - Strangler migration: architecture/decisions/0010-strangler-migration.md

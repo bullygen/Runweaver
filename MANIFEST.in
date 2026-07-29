@@ -1,0 +1,9 @@
+include ARCHITECTURE.md CHANGELOG.md CONTRIBUTING.md IMPLEMENTATION_REPORT.md
+include LICENSE PERFORMANCE_REPORT.md README.md SECURITY.md
+include alembic.ini mkdocs.yml noxfile.py
+recursive-include benchmarks *.py
+recursive-include docs *.md *.json
+recursive-include examples *.json
+recursive-include migration *.md
+recursive-include tutorials *.py *.ipynb *.md
+recursive-include src/runweaver/persistence/migrations *.py *.mako

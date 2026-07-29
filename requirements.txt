@@ -1,6 +1,2 @@
-numpy
-scipy
-scikit-image
-psutil
-
-matplotlib
+# Convenience minimal install. The canonical dependency declarations live in pyproject.toml.
+-e .

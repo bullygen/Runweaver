@@ -1,0 +1,1315 @@
+{
+  "$defs": {
+    "ActivationCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "parameter": {
+          "title": "Parameter",
+          "type": "string"
+        },
+        "operator": {
+          "default": "eq",
+          "enum": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "gt",
+            "ge",
+            "lt",
+            "le"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value"
+        }
+      },
+      "required": [
+        "parameter",
+        "value"
+      ],
+      "title": "ActivationCondition",
+      "type": "object"
+    },
+    "BlockConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "implementation": {
+          "title": "Implementation",
+          "type": "string"
+        },
+        "depends_on": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Depends On",
+          "type": "array"
+        },
+        "parameters": {
+          "additionalProperties": true,
+          "title": "Parameters",
+          "type": "object"
+        },
+        "map_over": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Map Over"
+        },
+        "parallelism": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Parallelism",
+          "type": "integer"
+        },
+        "resources": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResourceRequirements"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id",
+        "implementation"
+      ],
+      "title": "BlockConfig",
+      "type": "object"
+    },
+    "BooleanParameter": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "default": {
+          "type": "boolean",
+          "default": false,
+          "title": "Default"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "activation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ActivationCondition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "quantization": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantization"
+        },
+        "participates_in_hash": {
+          "default": true,
+          "title": "Participates In Hash",
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "boolean",
+          "default": "boolean",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "BooleanParameter",
+      "type": "object"
+    },
+    "CategoricalParameter": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "default": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "activation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ActivationCondition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "quantization": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantization"
+        },
+        "participates_in_hash": {
+          "default": true,
+          "title": "Participates In Hash",
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "categorical",
+          "default": "categorical",
+          "title": "Kind",
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "values"
+      ],
+      "title": "CategoricalParameter",
+      "type": "object"
+    },
+    "DerivedParameter": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "default": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "activation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ActivationCondition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "quantization": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantization"
+        },
+        "participates_in_hash": {
+          "default": true,
+          "title": "Participates In Hash",
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "derived",
+          "default": "derived",
+          "title": "Kind",
+          "type": "string"
+        },
+        "source_paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Paths",
+          "type": "array"
+        },
+        "expression": {
+          "title": "Expression",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "source_paths",
+        "expression"
+      ],
+      "title": "DerivedParameter",
+      "type": "object"
+    },
+    "ExecutorConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "$ref": "#/$defs/LocalBackend",
+          "default": "synchronous"
+        },
+        "materialization": {
+          "$ref": "#/$defs/MaterializationMode",
+          "default": "durable"
+        },
+        "max_workers": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Workers"
+        },
+        "work_dir": {
+          "default": ".runweaver/work",
+          "format": "path",
+          "title": "Work Dir",
+          "type": "string"
+        }
+      },
+      "title": "ExecutorConfig",
+      "type": "object"
+    },
+    "Experiment": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "default": "1",
+          "title": "Version",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "object"
+        },
+        "seed": {
+          "default": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "objectives": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Objective"
+          },
+          "title": "Objectives",
+          "type": "array"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Experiment",
+      "type": "object"
+    },
+    "FixedParameter": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "default": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "activation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ActivationCondition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "quantization": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantization"
+        },
+        "participates_in_hash": {
+          "default": true,
+          "title": "Participates In Hash",
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "fixed",
+          "default": "fixed",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "FixedParameter",
+      "type": "object"
+    },
+    "FloatParameter": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "default": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "activation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ActivationCondition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "quantization": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantization"
+        },
+        "participates_in_hash": {
+          "default": true,
+          "title": "Participates In Hash",
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "float",
+          "default": "float",
+          "title": "Kind",
+          "type": "string"
+        },
+        "low": {
+          "title": "Low",
+          "type": "number"
+        },
+        "high": {
+          "title": "High",
+          "type": "number"
+        },
+        "log": {
+          "default": false,
+          "title": "Log",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "low",
+        "high"
+      ],
+      "title": "FloatParameter",
+      "type": "object"
+    },
+    "IntegerParameter": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "default": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "activation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ActivationCondition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "quantization": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantization"
+        },
+        "participates_in_hash": {
+          "default": true,
+          "title": "Participates In Hash",
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "integer",
+          "default": "integer",
+          "title": "Kind",
+          "type": "string"
+        },
+        "low": {
+          "title": "Low",
+          "type": "integer"
+        },
+        "high": {
+          "title": "High",
+          "type": "integer"
+        },
+        "log": {
+          "default": false,
+          "title": "Log",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "low",
+        "high"
+      ],
+      "title": "IntegerParameter",
+      "type": "object"
+    },
+    "LocalBackend": {
+      "enum": [
+        "synchronous",
+        "threads",
+        "processes"
+      ],
+      "title": "LocalBackend",
+      "type": "string"
+    },
+    "MaterializationMode": {
+      "enum": [
+        "ephemeral",
+        "durable"
+      ],
+      "title": "MaterializationMode",
+      "type": "string"
+    },
+    "MetricDirection": {
+      "enum": [
+        "minimize",
+        "maximize",
+        "target"
+      ],
+      "title": "MetricDirection",
+      "type": "string"
+    },
+    "Objective": {
+      "additionalProperties": false,
+      "properties": {
+        "metric": {
+          "title": "Metric",
+          "type": "string"
+        },
+        "direction": {
+          "$ref": "#/$defs/MetricDirection"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target"
+        }
+      },
+      "required": [
+        "metric",
+        "direction"
+      ],
+      "title": "Objective",
+      "type": "object"
+    },
+    "OrdinalParameter": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "default": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "activation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ActivationCondition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "quantization": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantization"
+        },
+        "participates_in_hash": {
+          "default": true,
+          "title": "Participates In Hash",
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "ordinal",
+          "default": "ordinal",
+          "title": "Kind",
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "values"
+      ],
+      "title": "OrdinalParameter",
+      "type": "object"
+    },
+    "ParameterConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "title": "Expression",
+          "type": "string"
+        },
+        "message": {
+          "default": "parameter constraint failed",
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "expression"
+      ],
+      "title": "ParameterConstraint",
+      "type": "object"
+    },
+    "ParameterSpace": {
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "default": "1",
+          "title": "Version",
+          "type": "string"
+        },
+        "parameters": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "boolean": "#/$defs/BooleanParameter",
+                "categorical": "#/$defs/CategoricalParameter",
+                "derived": "#/$defs/DerivedParameter",
+                "fixed": "#/$defs/FixedParameter",
+                "float": "#/$defs/FloatParameter",
+                "integer": "#/$defs/IntegerParameter",
+                "ordinal": "#/$defs/OrdinalParameter"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/FloatParameter"
+              },
+              {
+                "$ref": "#/$defs/IntegerParameter"
+              },
+              {
+                "$ref": "#/$defs/CategoricalParameter"
+              },
+              {
+                "$ref": "#/$defs/BooleanParameter"
+              },
+              {
+                "$ref": "#/$defs/OrdinalParameter"
+              },
+              {
+                "$ref": "#/$defs/FixedParameter"
+              },
+              {
+                "$ref": "#/$defs/DerivedParameter"
+              }
+            ]
+          },
+          "title": "Parameters",
+          "type": "array"
+        },
+        "constraints": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ParameterConstraint"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "parent_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Version"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "title": "Metadata",
+          "type": "object"
+        }
+      },
+      "required": [
+        "parameters"
+      ],
+      "title": "ParameterSpace",
+      "type": "object"
+    },
+    "PipelineConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "default": "1",
+          "title": "Version",
+          "type": "string"
+        },
+        "blocks": {
+          "items": {
+            "$ref": "#/$defs/BlockConfig"
+          },
+          "title": "Blocks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "blocks"
+      ],
+      "title": "PipelineConfig",
+      "type": "object"
+    },
+    "PlannerConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "default": "random",
+          "enum": [
+            "grid",
+            "random",
+            "full_factorial",
+            "latin_hypercube",
+            "sobol",
+            "halton",
+            "optuna"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "n_trials": {
+          "default": 1,
+          "minimum": 1,
+          "title": "N Trials",
+          "type": "integer"
+        },
+        "seed": {
+          "default": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "options": {
+          "additionalProperties": true,
+          "title": "Options",
+          "type": "object"
+        }
+      },
+      "title": "PlannerConfig",
+      "type": "object"
+    },
+    "ResourceRequirements": {
+      "additionalProperties": false,
+      "properties": {
+        "cpu_cores": {
+          "default": 1.0,
+          "exclusiveMinimum": 0,
+          "title": "Cpu Cores",
+          "type": "number"
+        },
+        "gpu_count": {
+          "default": 0.0,
+          "minimum": 0,
+          "title": "Gpu Count",
+          "type": "number"
+        },
+        "gpu_memory_mb": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Gpu Memory Mb"
+        },
+        "ram_mb": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ram Mb"
+        },
+        "scratch_mb": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scratch Mb"
+        },
+        "custom": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Custom",
+          "type": "object"
+        },
+        "concurrency_group": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Concurrency Group"
+        },
+        "affinity": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Affinity",
+          "type": "array"
+        },
+        "anti_affinity": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Anti Affinity",
+          "type": "array"
+        },
+        "exclusive": {
+          "default": false,
+          "title": "Exclusive",
+          "type": "boolean"
+        },
+        "estimated_duration_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Estimated Duration S"
+        }
+      },
+      "title": "ResourceRequirements",
+      "type": "object"
+    },
+    "StorageConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_root": {
+          "default": ".runweaver/artifacts",
+          "title": "Artifact Root",
+          "type": "string"
+        },
+        "state_database_url": {
+          "default": "sqlite:///.runweaver/state.db",
+          "title": "State Database Url",
+          "type": "string"
+        }
+      },
+      "title": "StorageConfig",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "JSON-serializable, versioned configuration without embedded credentials.",
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "experiment": {
+      "$ref": "#/$defs/Experiment"
+    },
+    "pipeline": {
+      "$ref": "#/$defs/PipelineConfig"
+    },
+    "parameter_space": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ParameterSpace"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "planner": {
+      "$ref": "#/$defs/PlannerConfig"
+    },
+    "executor": {
+      "$ref": "#/$defs/ExecutorConfig"
+    },
+    "storage": {
+      "$ref": "#/$defs/StorageConfig"
+    },
+    "initial_input": {
+      "additionalProperties": true,
+      "title": "Initial Input",
+      "type": "object"
+    },
+    "tracking": {
+      "additionalProperties": true,
+      "title": "Tracking",
+      "type": "object"
+    },
+    "stop_conditions": {
+      "additionalProperties": true,
+      "title": "Stop Conditions",
+      "type": "object"
+    },
+    "observability": {
+      "additionalProperties": true,
+      "title": "Observability",
+      "type": "object"
+    },
+    "secret_names": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Secret Names",
+      "type": "array"
+    }
+  },
+  "required": [
+    "experiment",
+    "pipeline"
+  ],
+  "title": "ExperimentConfig",
+  "type": "object"
+}

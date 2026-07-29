@@ -1,0 +1,67 @@
+{
+  "schema_version": "1",
+  "experiment": {
+    "id": "8d7be50d-6354-4e71-95c5-82613acc02fb",
+    "name": "declarative-quickstart",
+    "description": "The same constant-scale-mean pipeline launched from versioned JSON",
+    "seed": 42,
+    "created_at": "2026-07-29T00:00:00Z",
+    "tags": {
+      "example": "true"
+    }
+  },
+  "pipeline": {
+    "name": "declarative-values",
+    "version": "1",
+    "blocks": [
+      {
+        "id": "generate",
+        "implementation": "runweaver.constant",
+        "parameters": {
+          "values": [1.0, 2.0, 3.0, 4.0]
+        }
+      },
+      {
+        "id": "scale",
+        "implementation": "runweaver.scale",
+        "depends_on": ["generate"],
+        "parameters": {
+          "factor": 2.5
+        },
+        "resources": {
+          "cpu_cores": 1.0,
+          "gpu_count": 0.0,
+          "custom": {}
+        }
+      },
+      {
+        "id": "evaluate",
+        "implementation": "runweaver.mean",
+        "depends_on": ["scale"]
+      }
+    ]
+  },
+  "planner": {
+    "kind": "random",
+    "n_trials": 1,
+    "seed": 42
+  },
+  "executor": {
+    "backend": "synchronous",
+    "materialization": "durable",
+    "work_dir": ".runweaver/example-work"
+  },
+  "storage": {
+    "artifact_root": ".runweaver/example-artifacts",
+    "state_database_url": "sqlite:///.runweaver/example-state.db"
+  },
+  "initial_input": {
+    "values": []
+  },
+  "tracking": {},
+  "stop_conditions": {},
+  "observability": {
+    "log_level": "INFO"
+  },
+  "secret_names": []
+}
