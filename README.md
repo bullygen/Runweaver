@@ -1,4 +1,4 @@
-# Runweaver
+# What is it?
 
 This library is built entirely with Codex ai-agent based on the feature and object structure of my ML pipelines that I've used in analysis of astrophysical images with computer vision (CV) algorithms. 
 
@@ -12,6 +12,8 @@ Please use it with caution. However, it has been useful for scaling some feature
 - CV algorithm evals for big batches of experiments
 
 It is useful, when you have a big algorithmic pipeline that is run on a local machine from tine to time and you need to tune a lot of hyperparameters and work flexibly with it.
+
+# Runweaver
 
 Runweaver is a typed domain layer for building, planning, executing and safely
 resuming computational and ML experiments over mature execution and tracking
