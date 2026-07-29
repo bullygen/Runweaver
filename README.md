@@ -1,17 +1,18 @@
-# What is it?
+# What is it in simple words (and without slop)?
 
 This library is built entirely with Codex ai-agent based on the feature and object structure of my ML pipelines that I've used in:
 - analysis of astrophysical images with computer vision (CV) algorithms;
-- training of neural nets for planning ai-models
+- training of neural nets for automated planning and scheduling (APS) ai-models
 
 Please use it with caution. However, it has been useful for scaling some features like:
 - experiment planning;
-- storage of intermediate calculations and allowing it to resume;
-- pipeline building from blocks;
-- automatic formation of experiment schedules with latin hypercubes of hyperparameters of ML-algorithms;
-- configuration of custom data types as i/o between blocks
-- synthetic datasets generation and usage
-- CV algorithm evals for big batches of experiments
+- storage of intermediate calculations and allowing it to resume with the same cli;
+- pipeline building from already written computational blocks;
+- automatic formation of experiment schedules with latin hypercubes of hyperparameters (LHH) of ML-algorithms;
+- automatic formation of new LHHs when you need to "zoom" into the parameter space and tune more
+- configuration of custom data types as i/o between blocks;
+- synthetic datasets generation and their bathcing into datasets of train/test/val;
+- CV and APS algorithms evals for big batches of experiments;
 
 It is useful, when you have a big algorithmic pipeline that is run on a local machine from time to time and you need to tune a lot of hyperparameters and work flexibly with it.
 
