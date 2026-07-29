@@ -1,5 +1,18 @@
 # Runweaver
 
+This library is built entirely with Codex ai-agent based on the feature and object structure of my ML pipelines that I've used in analysis of astrophysical images with computer vision (CV) algorithms. 
+
+Please use it with caution. However, it has been useful for scaling some features like:
+- experiment planning;
+- storage of intermediate calculations and allowing it to resume;
+- pipeline building from blocks;
+- automatic formation of experiment schedules with latin hypercubes of hyperparameters of ML-algorithms;
+- configuration of custom data types as i/o between blocks
+- synthetic datasets generation and usage
+- CV algorithm evals for big batches of experiments
+
+It is useful, when you have a big algorithmic pipeline that is run on a local machine from tine to time and you need to tune a lot of hyperparameters and work flexibly with it.
+
 Runweaver is a typed domain layer for building, planning, executing and safely
 resuming computational and ML experiments over mature execution and tracking
 backends.
