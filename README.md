@@ -1,6 +1,8 @@
 # What is it?
 
-This library is built entirely with Codex ai-agent based on the feature and object structure of my ML pipelines that I've used in analysis of astrophysical images with computer vision (CV) algorithms. 
+This library is built entirely with Codex ai-agent based on the feature and object structure of my ML pipelines that I've used in:
+- analysis of astrophysical images with computer vision (CV) algorithms;
+- training of neural nets for planning ai-models
 
 Please use it with caution. However, it has been useful for scaling some features like:
 - experiment planning;
@@ -11,7 +13,7 @@ Please use it with caution. However, it has been useful for scaling some feature
 - synthetic datasets generation and usage
 - CV algorithm evals for big batches of experiments
 
-It is useful, when you have a big algorithmic pipeline that is run on a local machine from tine to time and you need to tune a lot of hyperparameters and work flexibly with it.
+It is useful, when you have a big algorithmic pipeline that is run on a local machine from time to time and you need to tune a lot of hyperparameters and work flexibly with it.
 
 # Runweaver
 
